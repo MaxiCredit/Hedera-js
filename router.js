@@ -21,7 +21,7 @@ const TestUsers = "0.0.192457";
 const TestCredit = "0.0.192463";
 const mxOwner = "0.0.32592";
 const mxDex = "0.0.198981";
-const ownerPrKey = "302e020100300506032b657004220420a03515e2124e2668887288d0a9400d82c1d18a7ad96c226bafe1498a2b9c6a95";
+const ownerPrKey = "...";
 let hbarPrice = 0;
 
 getHbarPrice();
@@ -912,35 +912,6 @@ router.post('/dexHitMarket', (req, res) => {
                 default : console.log("NO ORDER TYPE!");
             }
         }
-
-        /*
-        let accountNumber = lib.accountNumber(mxDex);
-        let hexAddress = lib.solidityAddress(parseInt(accountNumber));
-        let params = new ContractFunctionParams()
-            .addAddress(hexAddress)
-            .addUint256(new BigNumber(amount));
-       
-        let params1 = new ContractFunctionParams()
-            .addUint256(new BigNumber(amount))
-            .addUint256(new BigNumber(price))
-            .addUint256(new BigNumber(last));
-        const client = lib.createHederaClient(accountID, privateKey);
-        if(client[1] != "ERROR") {
-            lib.sendContract(MXContractId, "approve", params, client).catch((error) => {
-                console.log("ERROR at approve: " + error);
-                res.send("ERROR: " + error);
-            }).then((result) => {
-                console.log("Approve: " + result.receipt.status);
-                                         
-                lib.sendContract(mxDex, "setOrderHbarAsk", params1, client).catch((erro) => {
-                    console.log("ERROR at setOrderHbarAsk: " + erro);
-                    res.send("ERROR: " + erro);
-                }).then((resul) => {
-                    console.log("Set ask: " + resul.receipt.status);
-                    res.send(resul.receipt.status);
-                });
-            });
-        }*/
     });
 });  
 
@@ -969,19 +940,6 @@ function getHbarPrice() {
     let Hederaprice = 100 / HbarUSD * 10000;
     console.log(Hederaprice);
     hbarPrice = parseInt(Hederaprice);
-    
-    /*
-    var prices = {
-        Bitcoin : priceObj.bitcoin.usd, 
-        Hederaprice : priceObj.hedera-hashgraph.usd
-    }
-    
-    var priceJson = JSON.stringify(prices);
-    console.log('response: ' + prices);
-    
-    fs.writeFile("crypto_price.txt", priceJson, function(err) {
-    if(err) throw err;
-    });*/
   });
 }
   
