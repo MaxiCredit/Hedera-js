@@ -15,7 +15,7 @@ const client = new Client({
 });
 
 const size = 2500;
-const smartContract = require("./sm0508/credit.json");
+const smartContract = require("..."); //byte contract json file
 
 const smartContractByteCode = smartContract.object;
 console.log("contract bytecode size:", smartContractByteCode.length, "bytes");
@@ -23,7 +23,6 @@ console.log("contract bytecode size:", smartContractByteCode.length, "bytes");
 const rounds = parseInt(smartContractByteCode.length / size);
 
 let byteCode = rounds < 1 ? smartContractByteCode : smartContractByteCode.substr(0, size);
-console.log(client._operatorPublicKey);
 console.log("contract bytecode size:", byteCode.length, "bytes");
 let fileID;
 
