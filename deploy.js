@@ -10,7 +10,7 @@ const client = new Client({
     network: {"1.testnet.hedera.com:50211": "0.0.4"},
     operator: {
         account: { shard: 0, real: 0, account: 23538},
-        privateKey: "302e020100300506032b65700422042049b657a1fa5de553edf9224bda0fcc93d522f307dc570d6a2fbe54e631a775f3"
+        privateKey: "..."
     },
 });
 
