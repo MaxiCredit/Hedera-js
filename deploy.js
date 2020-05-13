@@ -15,7 +15,7 @@ const client = new Client({
 });
 
 const size = 2500;
-const smartContract = require("..."); //byte contract json file
+const smartContract = require("..."); //contracts byte code in json file
 
 const smartContractByteCode = smartContract.object;
 console.log("contract bytecode size:", smartContractByteCode.length, "bytes");
