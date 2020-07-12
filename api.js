@@ -752,13 +752,13 @@ function listOffers(url, old_table) {
                         }
                     }
                     table.appendChild(table_row);
-                } else {
-                    document.getElementByID(old_table).innerHtml = "<tr><td>Jelenleg nincs ajánlat</td></tr>";
                 }
 
                 console.log(old_table);
                 console.log(document.getElementById(old_table));
                 document.getElementById(url).replaceChild(table, document.getElementById(old_table));
+            } else {
+                document.getElementByID(old_table).innerHtml = "<tr><td>Jelenleg nincs ajánlat</td></tr>";
             }
         }
     };
