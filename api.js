@@ -477,7 +477,7 @@ function regSubmit() {
     console.log("personal datas: " + rFirstName + " " + rLastName + " " + rBirthName + " " + rBirthDate + " " + rMotherFirst + " " + rMotherLast + " " + rId + " " + rCitizen + " "
           + rCountry + " " + rCity + " " + rAddress + " " + rEmail + " " + rPhone);
     //user(rName, rBirthDate, rMother, rId, rCountry, rCity, rAddress, rEmail, rPhone, rKey, TestUsersAbi);
-    $.post("http://localhost:3000/register", {"pr" : prKey, "acc" : account, "firstname" : rFirstName, "lastname" : rLastName, "birthday" : rBirthDate, "motherfirstname" : rMotherFirst, "motherlastname" : rMotherLast, "id" : rId, "citizen" : rCitizen, "country" : rCountry, "city" : rCity, "address" : rAddress, "email" : rEmail, "phone" : rPhone, "birthName" : rBirthName}, function(data, status) {
+    $.post("http://3.126.151.244:3000//register", {"pr" : prKey, "acc" : account, "firstname" : rFirstName, "lastname" : rLastName, "birthday" : rBirthDate, "motherfirstname" : rMotherFirst, "motherlastname" : rMotherLast, "id" : rId, "citizen" : rCitizen, "country" : rCountry, "city" : rCity, "address" : rAddress, "email" : rEmail, "phone" : rPhone, "birthName" : rBirthName}, function(data, status) {
         console.log(data);
         console.log(data.receipt.status);
         if(data.receipt.status == "SUCCESS") {
@@ -554,7 +554,7 @@ function acceptOffer() {
         console.log("capital: " + capital + " interest: " + interest + " periods: " + periods + " payback: " + payback);
         
         let req = "pr=" + prKey + "&acc=" + account + "&payback=" + payback + "&offerToAccept=" + offerToAccept + "&amount=" + amount;
-        myAjax("POST", "http://localhost:3000/acceptOffer", req, (err, res) => {
+        myAjax("POST", "http://3.126.151.244:3000/acceptOffer", req, (err, res) => {
             if(!err) {
                 console.log(res, typeof(res));
                 closeModal();
@@ -600,7 +600,7 @@ function myAjax(type, url, req, callback) {
 }
 
 function loginAjax(req) {
-    myAjax("POST", "http://localhost:3000/client", req, function(err, res) {
+    myAjax("POST", "http://3.126.151.244:3000/client", req, function(err, res) {
         if(!err) {
             console.log(res);
             let data = JSON.parse(res);
@@ -649,7 +649,7 @@ function login() {
 }
 
 function newAccount() {
-    myAjax("POST", "http://localhost:3000/createAccount", "", function(err, res) {
+    myAjax("POST", "http://3.126.151.244:3000/createAccount", "", function(err, res) {
         if(!err) {
             let data = JSON.parse(res);
             newAcc.push(data[1]);
@@ -661,17 +661,6 @@ function newAccount() {
 
         }
     });
-    /*
-    $.post('', (data, status) => {
-        console.log(data);
-        console.log(status);
-        if(data[0] == "SUCCESS") {
-            $("#new-account-number").html("Számlaszám: " + data[1].shard + "." + data[1].realm + "." + data[1].account);
-            $("#new-account-prkey").html("Privát kulcs: " + data[2]);
-            $("#new-account-modal").show();
-
-        }
-    });*/
 }
 
 function saveNewAccount() {
@@ -771,7 +760,7 @@ function listOffers(url, old_table) {
             }
         }
     };
-    xhttp.open("POST", "http://localhost:3000/offers", true);
+    xhttp.open("POST", "http://3.126.151.244:3000/offers", true);
     xhttp.setRequestHeader("Content-type", "text/plain");
     xhttp.send();
 }
