@@ -1,3 +1,5 @@
+console.log("HELLO");
+
 let offers = [];
 let account = "";
 let prKey = "";
