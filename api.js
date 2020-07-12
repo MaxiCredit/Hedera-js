@@ -1,5 +1,3 @@
-console.log("HELLO");
-
 let offers = [];
 let account = "";
 let prKey = "";
@@ -754,6 +752,8 @@ function listOffers(url, old_table) {
                         }
                     }
                     table.appendChild(table_row);
+                } else {
+                    document.getElementByID(old_table).innerHtml = "<tr><td>Jelenleg nincs ajánlat</td></tr>";
                 }
 
                 console.log(old_table);
