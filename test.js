@@ -1,3 +1,4 @@
+
 let privateKey = "";
 let currentAccount = "";
 let currentMXBalance;
@@ -7,12 +8,10 @@ let logged = 0;
 let score = "You are not registered!";
 let hbarPrice = 0;
 let loginKeyFile = "";
-
 let currentTab = $("#main");
 let lastTab = $("#loan-claims");
 let prevMxx = $("#credit-offer-btn");
 let prevMX = $("#send-receive-btn");
-//console.log(paypal_sdk);
 
 window.onbeforeunload = function () {
     if(logged == 1) {
@@ -21,7 +20,6 @@ window.onbeforeunload = function () {
 }
 
 $(window).on("load", () => {
-    //console.log(currentAccount);
     $("#login-modal").show();
 });
 
@@ -46,7 +44,6 @@ if(typeof web3 !== 'undefined') {
 const ST6Address = '0x646c49b692cea87aa4dbb13f34346fa781067f21';
 const stable = new web3.eth.Contract(erc20_abi, ST6Address);
 const changeFromETH = new web3.eth.Contract(abi, '0x17070EdD831C8BE6CC6f49A429d37134D7Dfb745');
-
 let buyMXPrice = 0;
 let sellMXPrice = 0;
 let buyUSDPrice = 0;
@@ -79,7 +76,6 @@ $("#login-btn").click(() => {
         if(privateKey && currentAccount) {
             refreshAccount(privateKey, currentAccount, (err, res) => {
                 if(!err) {
-
                     $("#login-acc").val("");
                     $("#login-prkey").val("");
                     $("#login-modal").hide();
@@ -95,14 +91,10 @@ $("#login-btn").click(() => {
     }
 
     if($("#login-acc").val() && $("#login-prkey").val()) {
-        //console.log("MACI");
         currentAccount = $("#login-acc").val();
         privateKey = $("#login-prkey").val();
         login(privateKey, currentAccount);
     } else {
-        //var file = $('#login-key').prop('files')[0];
-        //$("#choosen-key").html(file.name);
-        //console.log(file);
         var reader = new FileReader();
         reader.readAsText(loginKeyFile, 'UTF-8');
         reader.onload = (evt) => {
@@ -112,36 +104,13 @@ $("#login-btn").click(() => {
             privateKey = key[1];
             login(privateKey, currentAccount);
         }
-        loginKeyFile = "";
     } 
 });
 
 $("#login-key").change(() => {
-    loginKeyFile = $('#login-key').prop('files')[0];
-    $("#choosen-key").html(loginKeyFile.name);
-});
-/*
-$("#login-with-key").click(() => {
     var file = $('#login-key').prop('files')[0];
-    var reader = new FileReader();
-    reader.readAsText(file, 'UTF-8');
-    reader.onload = (evt) => {
-        let key = JSON.parse(evt.target.result);
-        console.log(key[0]);
-
-        refreshAccount(privateKey, currentAccount, (err, res) => {
-            if(!err) {
-                $("#login-acc").val("");
-                $("#login-prkey").val("");
-                $("#login-modal").hide();
-            } else {
-                $("#login-acc").val("");
-                $("#login-prkey").val("");
-                $("#login-error").html("HIBA, probáld újra");
-            }
-        });
-    }
-});*/
+    $("#choosen-key").html(file.name);
+});
 
 $("#main-tab").click(() => {
     $("#wallet").attr("class", "section type-4 p-3 d-none");
@@ -166,57 +135,58 @@ let walletClick = (id) => {
 } 
 
 $(".wallet-tab").click(() => {
-    console.log("WALLET");
-    /*
-    $("#change").attr("class", "d-none");
-    */
     walletClick("#tx");
     $("#wallet-title").html("Maxit/Hbar küldése, fogadása");
 });
 
-$(".lender-tab").click(() => {
-    currentTab.attr("class", "section type-4 p-3 d-none");
+let lenderClick = (id) => {
+	currentTab.attr("class", "section type-4 p-3 d-none");
     lastTab.attr("class", "d-none");
     $("#lender").attr("class", "section type-4 p-3 d-block");
-    $("#loan-claims").attr("class", "d-block");
-    $("#lending-title").html("Kölcsönadó - Hitel kérelmek");
-    listClaims("lender-main");
+    $(id).attr("class", "d-block");
     currentTab = $("#lender");
-    lastTab = $("#loan-claims");
-    prevMX.attr("class", "btn btn-secondary mx-button");
-    $("#loan-claims-btn").attr("class", "btn btn-dark mx-button");
-    prevMX = $("#loan-claims-btn");
+    lastTab = $(id);
+    prevMX.attr("class", "btn btn-secondary mx-button");  
+}
+
+$(".lender-tab").click(() => {
+	lenderClick("#loan-claims");
+	listClaims("lender-main");
+	$("#lending-title").html("Kölcsönadó - Hitel kérelmek");
+	$("#loan-claims-btn").attr("class", "btn btn-dark mx-button");
+	prevMX = $("#loan-claims-btn");
 });
 
-$(".borrower-tab").click(() => {
-    currentTab.attr("class", "section type-4 p-3 d-none");
+let borrowerClick = (id) => {
+	currentTab.attr("class", "section type-4 p-3 d-none");
     lastTab.attr("class", "d-none");
     $("#borrower").attr("class", "section type-4 p-3 d-block");
-    $("#loan-offers").attr("class", "d-block");
+    $(id).attr("class", "d-block");	
+	currentTab = $("#borrower");    
+    lastTab = $(id);
+	prevMX.attr("class", "btn btn-secondary mx-button");
+}
+
+$(".borrower-tab").click(() => {
+	borrowerClick("#loan-offers");
     $("#borrower-title").html("Kölcsönvevő - Hitel ajánlatok"); 
     listOffers("borrower-main");
-    currentTab = $("#borrower");    
-    lastTab = $("#loan-offers");
-    prevMX.attr("class", "btn btn-secondary mx-button");
     $("#loan-offers-btn").attr("class", "btn btn-dark mx-button");
     prevMX = $("#loan-offers-btn");
 });
 
 refreshAccount = (privateKey, currentAccount, callback) => {
-    console.log("ACCOUNT:", currentAccount);
+    //console.log("ACCOUNT:", privateKey, currentAccount);
     $.post('client', {"pr" : privateKey, 'acc' : currentAccount}, function(data, status) {
         //console.log("ACCOUNT:");
         //console.log(data);
         //console.log(status);
         if(status == "success" && data.slice(0,5) != "ERROR") {
             let clientData = JSON.parse(data);
-            console.log(clientData);
             $("#address").html("Számla: " + currentAccount);
             $("#hbar-balance").html(parseFloat(clientData.hbarBalance).toFixed(2) + " Hbar");
             $("#mx-balance").html(clientData.mxBalance + " MX");
-            currentMXBalance = clientData.mxBalance;
-            currentHbarBalance = clientData.hbarBalance;
-            logged = 1;
+            
             score = clientData.registration;
             if(score > 0) {
                 $("#personal-info-text").html("Módosítás");
@@ -245,22 +215,6 @@ $("#refresh").click(() => {
 });
 
 /*
-$("#login-btn").click(() => { 
-    $("#disclaimer").show();
-    $("#disclaimer-accept-btn").click(() => {
-        if($("#login-tab").html() == "Login") {
-            console.log("LOGIN");
-            
-            privateKey = $("#pr-key").val();
-            account = "0.0." + $("#account-id").val();
-            console.log(privateKey);
-            console.log(account);
-    
-            getBalance('login');
-        }  
-        $("#disclaimer").hide();
-    });
-});
 
 $("#disclaimer-run-btn").click(() => {
     $("#disclaimer").hide();
@@ -270,133 +224,7 @@ $("#disclaimer-run-btn").click(() => {
     $("#pr-key").val("");
 });
 
-$("#login-tab").click(() => {
-    if($("#login-tab").html() == "Logout") {
-        console.log("LOGOUT");
-        privateKey = "";
-        account = "";
-        $("#account-id").val("");
-        $("#pr-key").val("");
-        $("#pr-key-reg").val("");
-        $("#account-id-reg").val("");
-        $("#login-tab").html("Login");
-        $("#login-card").show();
-        $("#acc-tab").attr("class" , "nav-link invisible");
-        $("#lend-tab").attr("class" , "nav-link invisible");
-        $("#my-offer-claim-tab").attr("class" , "nav-link invisible");
-        $("#tx-tab").attr("class" , "nav-link invisible");
-        $("#history-tab").attr("class" , "nav-link invisible");
-        $("#create-offer-tab").attr("class" , "nav-link invisible");
-        $("#offer-claim-tab").attr("class" , "nav-link invisible");
-        $("#register-tab").html("My details");
-        $("#register-tab").attr("class" , "nav-link invisible");
-        $("#my-lendings").empty();
-        $("#hedera-details").empty();
-        $('#qrcode').empty();
-        $("#reg-user").attr("class" , "d-none");
-        $("#mod-user").attr("class" , "d-none");
-    }     
-});
 
-getBalance = (type) => {
-    if(privateKey != "" && account != "") {
-        $.post('client', {"pr" : privateKey, 'acc' : account}, function(data, status) {
-            console.log(data);
-            console.log(status);
-            let HbarBalance = parseFloat(data.slice(0, data.indexOf('---'))).toFixed(2);
-            let MXBalance = data.slice(data.indexOf('---') + 3, data.indexOf('&&&'));
-            score = data.slice(data.indexOf('&&&') + 3, data.indexOf('///'));
-            hbarPrice = data.slice(data.indexOf('///') + 3);
-            if(data != "ERROR") {
-                if(type == "login") {
-                    logged = 1;
-                    $("#login-tab").html("Logout");
-                    $("#login-card").hide();
-                    $("#acc-tab").attr("class" , "nav-link active visible");
-                    $("#lend-tab").attr("class" , "nav-link visible");
-                    $("#my-offer-claim-tab").attr("class" , "nav-link visible");
-                    $("#tx-tab").attr("class" , "nav-link visible");
-                    $("#history-tab").attr("class" , "nav-link visible");
-                    $("#create-offer-tab").attr("class" , "nav-link visible");
-                    $("#offer-claim-tab").attr("class" , "nav-link visible");
-                    $("#register-tab").attr("class" , "nav-link visible");
-                    $("#login-tab").attr("class" , "nav-link");
-                    $("#login").attr("class" , "tab-pane fade");
-                    $("#acc").attr("class" , "tab-pane fade show active");
-                    $('#qrcode').qrcode({width: 128, height: 128, text: account});
-                    $('#qrcode').show();
-                    if(score == "You are not registered!") {
-                        $("#reg-user").attr("class" , "visible");
-                    }
-
-                    if(score == "You are not verified yet!") {
-                        $("#reg-user").attr("class" , "d-none");
-                        $("#mod-user").attr("class" , "d-none");
-                    }
-
-                    if(score > 0) {
-                        $("#register-tab").html("My details");
-                        $("#mod-user").attr("class" , "visible");
-                    }
-                }              
-
-                $(".hedera-address").html("Hedera address " + account);
-                $(".hedera-balance").html("Hbar balance " + HbarBalance);
-                $(".maxit-balance").html("Maxit balance " + MXBalance);
-                $(".my-credit-score").html("Credit score " + score);
-                $("#hedera-details").empty();
-                $("#hedera-details").append("<tr><td>Hedera address</td><td>" + account + "</td></tr><tr><td>Hedera balance</td><td>" + 
-                    HbarBalance + " hbar</td></tr><tr><td>Maxit balance</td><td>" + MXBalance + " MX</td></tr><tr><td>Credit score</td><td id=\"score\">" + score + "</td></tr>");
-            } else {
-                alert("Wrong account ID or private key");
-                privateKey = "";
-                account = "0.0.";
-                $("#pr-key").val("");
-                $("#account-id").val("");
-            }
-        });
-    }
-}
-
-$(".refresh-account").click(() => {
-    console.log("clicked refresh");
-    getBalance('');
-});
-
-$("#register-btn").click(() => {
-    $("#login-tab").attr("class" , "nav-link");
-    $("#login").attr("class" , "tab-pane fade");
-    $("#register").attr("class" , "tab-pane fade show active");
-    $("#reg-selector").attr("class", "visible");
-    $("#reg-user-login").attr("class", "d-none");
-    $("#new-acc").attr("class", "d-none");
-    $("#reg-user").attr("class" , "d-none");
-    $("#register-tab").attr("class" , "nav-link active visible");
-});
-
-$("#register-user-btn").click(() => {
-    $("#reg-selector").attr("class", "d-none");
-    $("#reg-user-login").attr("class", "visible");
-});
-
-$("#new-account-btn").click(() => {
-    $("#reg-selector").attr("class", "d-none");
-    $("#new-acc").attr("class", "visible");
-});
-
-$("#login-btn-reg").click(() => {
-    
-    if($("#login-tab").html() == "Login") {
-        console.log("LOGIN");
-        
-        privateKey = $("#pr-key-reg").val();
-        account += $("#account-id-reg").val();
-        console.log(privateKey);
-        console.log(account);
-
-        getBalance('login-reg');
-    }     
-});
 */
 $("#reg-birth-firstname-copy").click(() => {
     $("#reg-birth-firstname").html($("#reg-firstname").val());
@@ -558,12 +386,7 @@ offerNgApp.controller("mcCtrl", function($scope) {
 
     $scope.changeDetails = function() {
         let changeSum;
-        let changeType;
-        if(!$scope.changeType) {
-            changeType = $scope.selectCurrency + "buy";
-        } else {
-            changeType = $scope.selectCurrency + $scope.changeType;
-        }
+        let changeType = $scope.selectCurrency + $scope.changeType;
         let changeDetailsResponse;
         if($scope.changeAmount) {
             switch(changeType) {
@@ -593,24 +416,21 @@ offerNgApp.controller("mcCtrl", function($scope) {
 $(".send-receive-btn").click(function() {
     walletClick("#tx");
     $("#wallet-title").html("Maxit/Hbar küldése, fogadása");
-
 });
 
 $(".change-btn").click(function() {
     getHbarPrice();
-    walletClick("#change")
+	walletClick("#change");
     $("#wallet-title").html("Maxit váltó");
 });
 
 $(".account-info-btn").click(function() {
-    walletClick("#account-info")
+	walletClick("#account-info");
     $("#wallet-title").html("Számla információ");
 });
 
 $(".personal-btn").click(function() {
-    //lastTab.attr("class", "d-none");
-    //$("#personal").attr("class", "d-block");
-    walletClick("#personal");
+	walletClick("#personal");
     console.log(score);
     //Check if a user is registered
     if(score == "You are not registered!") {
@@ -632,9 +452,6 @@ $(".personal-btn").click(function() {
         $("#mod-user").attr("class", "d-block");
         $("#wallet-title").html("Személyes adatok módosítása");
     }
-    //if user is registered
-    //
-    //lastTab = $("#personal");
 });
 
 $(".mxx-button").click(function() {
@@ -657,47 +474,23 @@ $("#send-btn").click(function() {
     var amount = $("#send-amount").val();
     //check to, amount
     console.log("Type:", type, "to:", to, "amount:", amount);
-    console.log(currentHbarBalance, currentMXBalance);
-    console.log(typeof(amount), typeof(currentMXBalance));
+    
     switch(type) {
         case "Maxit" :
-            if(parseInt(amount) <= parseInt(currentMXBalance)) {
-                $.post('sendMaxit', {"pr" : privateKey, "acc" : currentAccount, "to" : to, "amount" : amount}, function(data, status) {
-                    //console.log(data);
-                    //console.log(status);
-                    if(data.receipt.status == "SUCCESS") {
-                        $("#send-address").val("");
-                        $("#send-amount").val("");
-                        refreshAccount(privateKey, currentAccount, (err, res) => {});
-                        alertModal("Sikeres Maxit küldés, " + amount + "MX");
-                    } else {
-                        alertModal("HIBA: " + data);
-                    }
-                });
-            } else {
-                alertModal("Nem rendelkezel ennyi Maxittal!");
-            }
+            $.post('sendMaxit', {"pr" : privateKey, "acc" : currentAccount, "to" : to, "amount" : amount}, function(data, status) {
+                console.log(data);
+                console.log(status);
+                $("#send-address").val("");
+                $("#send-amount").val("");
+            });
             break;
         case "Hbar" :
-            if(parseFloat(amount) <= parseFloat(currentHbarBalance)) {
-                $.post('sendHbar', {"pr" : privateKey, "acc" : currentAccount, "to" : to, "amount" : amount}, function(data, status) {
-                    //console.log(data);
-                    //console.log(status);
-                    if(data == "SUCCESS") {
-                        $("#send-address").val("");
-                        $("#send-amount").val("");
-                        alertModal("Sikeres Hbar küldés, " + amount + "Hbar");
-                        let doNothing = () => {
-                            refreshAccount(privateKey, currentAccount, (err, res) => {});
-                        };
-                        setTimeout(doNothing, 1000);                     
-                    } else {
-                        alertModal("HIBA: " + data);
-                    }
-                });
-            } else {
-                alertModal("Nem rendelkezel ennyi Hbarral!"); 
-            }
+            $.post('sendHbar', {"pr" : privateKey, "acc" : currentAccount, "to" : to, "amount" : amount}, function(data, status) {
+                console.log(data);
+                console.log(status);
+                $("#send-address").val("");
+                $("#send-amount").val("");
+            });
             break;
         case "" :
             alertModal("Adj meg tokent");
@@ -711,70 +504,33 @@ $("#mxx-btn").click(() => {
     let type = $("input[name=offer-type]:checked").val();
     let amount = $("#mxx-amount").val();
 
-    //console.log(currency, type, amount);
-
-    switch(type) {
-        case "buy" : alertModal(amount + " Maxit vétele " + currency + " révén");
-            break;
-        case "sell" : alertModal(amount + " Maxit eladása " + currency + "ért");
-            break;
-        default : alertModal("Válasz, hogy vennél vag yeladnál Maxitot!");
-    }
-    
+    console.log(currency, type, amount);
     let action = currency + type;
 
     switch(action) {
         case 'Hbarbuy' : 
-            if(amount * buyMXPrice / 100000000 < currentHbarBalance) {
-                $.post('buyMX', {'pr' : privateKey, 'acc' : currentAccount, 'amount' : amount}, (data, status) => {
-                    console.log(data);
-                    console.log(status);
-                    if(data.slice(0, 5) != "ERROR") {
-                        $("#mxx-amount").val("");
-                        $("#change-details").html("");
-                        refreshAccount(privateKey, currentAccount, (err, res) => {});
-                    } else {
-                        alertModal("HIBA: " + data);
-                    }
-                });
-            } else {
-                alertModal("Maximum " + parseInt(currentHbarBalance / (buyMXPrice / 100000000)) + " Maxitot tudsz venni");
-            }
-
+            $.post('buyMX', {'pr' : privateKey, 'acc' : currentAccount, 'amount' : amount}, (data, status) => {
+                console.log(data);
+                console.log(status);
+                if(status == "success") $("#mxx-amount").val("");
+            });
             break;
         case 'Hbarsell' : 
-            if(amount <= currentMXBalance) {
-                $.post('sellMX', {'pr' : privateKey, 'acc' : currentAccount, 'amount' : amount}, (data, status) => {
-                    console.log(data);
-                    console.log(status);
-                    if(data.slice(0, 5) != "ERROR") {
-                        $("#mxx-amount").val("");
-                        $("#change-details").html("");
-                        let doNothing = () => {
-                            refreshAccount(privateKey, currentAccount, (err, res) => {});
-                        };
-                        setTimeout(doNothing, 1000);
-                    } else {
-                        alertModal("HIBA: tranzakció azonosító " + data.slice(78, 110));
-                    }
-    
-                });
-            } else {
-                alertModal("Maximum " + currentMXBalance + " Maxitot tudsz eladni");
-            }
-
+            $.post('sellMX', {'pr' : privateKey, 'acc' : currentAccount, 'amount' : amount}, (data, status) => {
+                console.log(data);
+                console.log(status);
+                if(status == "success") $("#mxx-amount").val("");
+            });
             break;
         case 'Tetherbuy' : 
-            let tetherPrice = new BigNumber(parseInt(amount * 10000 * 1005 / 1000));
-            let hederaAddress = solidityAddress(parseInt(accountNumber(currentAccount)));
-            console.log("hedera address:", hederaAddress);
+            let tetherPrice = new BigNumber(parseInt(amount * 10000));
+            let hederaAddress = '0x0000000000000000000000000000000000005D03';
             stable.methods.approve('0x17070EdD831C8BE6CC6f49A429d37134D7Dfb745', tetherPrice).send({from : ethAddr}, (err, res) => {
                 if(!err) {
-                    alertModal("Tether elköltése engedélyezve, összeg: " + amount * 1005 / 100000);
+                    alertModal("Tether elköltése engedélyezve a szerződés számára, összeg: " + amount / 100);
                     changeFromETH.methods.convertToHederaMX(amount, hederaAddress).send({from : ethAddr}, (err, res) => {
                         if(!err) {
-                            alertModal("Tether kifizetve, összeg: " + amount * 1005 / 100000);
-                            //refreshAccount(privateKey, currentAccount, (err, res) => {});
+                            alertModal("Tether kifizetve, összeg: " + amount / 100);
                         } else {
                             console.log(err);
                         }
@@ -785,23 +541,9 @@ $("#mxx-btn").click(() => {
             });
             break;
         case 'Tethersell' : 
-            if(amount <= currentMXBalance) {
-                $.post('sellMXtoTether', {'pr' : privateKey, 'acc' : currentAccount, 'amount' : amount, 'eth' : ethAddr}, (data, status) => {
-                    console.log(data);
-                    console.log(status);
-                    if(status == "success") {
-                        $("#mxx-amount").val("");
-                        let doNothing = () => {
-                            refreshAccount(privateKey, currentAccount, (err, res) => {});
-                        };
-                        setTimeout(doNothing, 1000);
-                    } 
-                });
-            } else {
-                alertModal("Maximum " + currentMXBalance + " Maxitot tudsz eladni");
-            }
+            
             break;
-        default: alertModal('HIBA, nem választottad ki, hogy vennél vagy eladnál, melyik kriptovalutával szemben vagy mekkora összegben!');
+        default: alertModal('HIBA');
     }
 });
 
@@ -834,45 +576,36 @@ paypal_sdk.Buttons({
         return actions.order.capture().then(function(details) {
             console.log(details);
           // This function shows a transaction success message to your buyer.
-          alertModal('Fizetve ' + toPayHUF + ' HUF, Paypal tranzakció azonosító: ' + details.id);
-
-          $.get("paypalCheck?orderId=" + details.id + "&account=" + currentAccount + "&mxAmount=" + mxAmount, (data, status) => {
+          alert('Fizetve ' + toPayHUF + ' HUF, ügyfél: ' + details.payer.name.given_name);
+          let paypalDetails = {
+              orderId: details.id,
+              account: currentAccount,
+              mxAmount: mxAmount
+          };
+          $.get("paypalCheck", {paypalDetails}, (data, status) => {
             console.log(data);
             console.log(status);
-            if(data == mxAmount + " MX has been sent to " + currentAccount) {
-                $("#paypal-mx-amount").val("");
-                alertModal("SIKER");
-                refreshAccount(privateKey, currentAccount, (err, res) => {}); 
-            } else {
-                alertModal('Paypal tranzakció azonosító: ' + details.id + ' amennyiben nem érkezik meg a vásárolt Maxitjai a számlájára, ezen azonosítóra hivatkozzon reklamációja során');
-            }
           });
         });
     }
-}).render('#paypal');
+  }).render('#paypal');
 
-$("#loan-claims-btn").click(() => {
-    lastTab.attr("class", "d-none");
-    $("#loan-claims").attr("class", "d-block");
+$(".loan-claims-btn").click(() => {
+	lenderClick("#loan-claims");
     listClaims("lender-main");
     $("#lending-title").html("Kölcsönadó - Hitel kérelmek");
-    lastTab = $("#loan-claims");
 });
 
-$("#my-offers-btn").click(() => {
-    lastTab.attr("class", "d-none");
-    $("#my-loan-offers").attr("class", "d-block");
+$(".my-offers-btn").click(() => {
+	lenderClick("#my-loan-offers");
     listOffers("lender-my-offers");
     $("#lending-title").html("Kölcsönadó - Saját ajánlataim");
-    lastTab = $("#my-loan-offers");
 });
 
-$("#create-offer-btn").click(() => {
-    $("#lending-title").html("Kölcsönadó - Új hitel ajánlat");
-    lastTab.attr("class", "d-none");
+$(".create-offer-btn").click(() => {
     if(score > 0) {
-        $("#create-offer").attr("class", "d-block");
-        lastTab = $("#create-offer");
+		$("#lending-title").html("Kölcsönadó - Új hitel ajánlat");
+		lenderClick("#create-offer");
     } else {
         alertModal("Csak regisztrált felhasználók adhatnak kölcsön!");
         $("#wallet").attr("class", "section type-4 p-3 d-none");
@@ -880,41 +613,34 @@ $("#create-offer-btn").click(() => {
         $("#borrower").attr("class", "section type-4 p-3 d-none");
         $("#main").attr("class", "section type-4 p-3 d-block");
         currentTab = $("#main");
+		lastTab.attr("class", "d-none");
         console.log(currentTab);
     }
 });
 
-$("#my-lendings-btn").click(() => {
-    lastTab.attr("class", "d-none");
-    $("#my-lendings").attr("class", "d-block");
+$(".my-lendings-btn").click(() => {
+	lenderClick("#my-lendings");
     $("#lending-title").html("Kölcsönadó - Hiteleim"); 
     listLendings();
-    lastTab = $("#my-lendings");
     //console.log("lastTab", lastTab);
 });
 
-$("#loan-offers-btn").click(() => {
-    lastTab.attr("class", "d-none");
-    $("#loan-offers").attr("class", "d-block");
+$(".loan-offers-btn").click(() => {
+	borrowerClick("#loan-offers");
     listOffers("borrower-main");
     $("#borrower-title").html("Kölcsönvevő - Hitel ajánlatok"); 
-    lastTab = $("#loan-offers");
 });
 
-$("#my-claims-btn").click(() => {
-    lastTab.attr("class", "d-none");
-    $("#my-loan-claims").attr("class", "d-block");
+$(".my-claims-btn").click(() => {
+	borrowerClick("#my-loan-claims");
     listClaims("borrower-my-claims");
     $("#borrower-title").html("Kölcsönvevő - Saját kérelmeim");
-    lastTab = $("#my-loan-claims");
 });
 
-$("#create-claim-btn").click(() => {
-    $("#borrower-title").html("Kölcsönvevő - Új hitel kérelem");
-    lastTab.attr("class", "d-none");
+$(".create-claim-btn").click(() => {
     if(score > 0) {
-        $("#create-claim").attr("class", "d-block");
-        lastTab = $("#create-claim");
+		borrowerClick("#create-claim");
+		$("#borrower-title").html("Kölcsönvevő - Új hitel kérelem");
     } else {
         alertModal("Csak regisztrált felhasználók kérhetnek kölcsön!");
         $("#wallet").attr("class", "section type-4 p-3 d-none");
@@ -922,16 +648,15 @@ $("#create-claim-btn").click(() => {
         $("#borrower").attr("class", "section type-4 p-3 d-none");
         $("#main").attr("class", "section type-4 p-3 d-block");
         currentTab = $("#main");
+		lastTab.attr("class", "d-none");
         console.log(currentTab);
     }
 });
 
-$("#my-credits-btn").click(() => {
-    lastTab.attr("class", "d-none");
-    $("#my-credits").attr("class", "d-block");
+$(".my-credits-btn").click(() => {
+	borrowerClick("#my-credits");
     $("#borrower-title").html("Kölcsönvevő - Hiteleim"); 
     listCredits();
-    lastTab = $("#my-credits");
 });
 
 
@@ -950,7 +675,7 @@ $("#list-old-credits").click(() => {
                     calcDate(myCredits[i].length, lengthDHM);
                     $("#history-table").append("<tr><td>" + myCredits[i].capital + " / " + myCredits[i].initialCapital + "</td><td>" + 
                         myCredits[i].toPayBack + "</td><td>" + myCredits[i].interestRate / 10 + "</td><td>" + myCredits[i].lastReedem + " / " + 
-                        myCredits[i].periods + "</td><td>" + lengthDHM.remainDay + "D " + lengthDHM.remainHour + "H " + lengthDHM.remainMin + "M"  + "</td></tr>");
+                        myCredits[i].periods + "</td><td>" + lengthDHM.remainDay + " nap</td></tr>");
                 }
             }
         }
@@ -1026,7 +751,7 @@ $("#list-my-old-lendings").click(() => {
                 if(myLendings[i].lastReedem == myLendings[i].periods) {
                     $("#history-table").append("<tr><td>" + myLendings[i].capital + " / " + myLendings[i].initialCapital + "</td><td>" + 
                     myLendings[i].toPayBack + "</td><td>" + myLendings[i].interestRate / 10 + "</td><td>" + myLendings[i].lastReedem + " / " + 
-                    myLendings[i].periods + "</td><td>" + myLendings[i].length + "</td></tr>");
+                    myLendings[i].periods + "</td><td>" + myLendings[i].length / 86400 + " nap</td></tr>");
                 }
             }
         }
@@ -1145,8 +870,8 @@ $(".new-offer").click(function() {
             console.log(creditScore);
         }
 
-        if(loanLength / periods < 86401) {
-            alertModal("Egy periódusnak hosszabbnak kell lennie mint egy nap (a hossz legyen nagyobb mint a részletek száma)!");
+        if(loanLength / periods < 86400) {
+            alertModal("Egy periódusnak minimum egy nap hosszúnak kell lenni!");
         } else {
             if(confirmOrder == true) {
                 if(creditAmount > 0 && loanLength > 0 && periods > 0 && interestRate > 0 && lastTo > 0) {
@@ -1212,15 +937,15 @@ listOffers = (type) => {
                 let annualRate = annumInterest(offers[i].length, offers[i].periods, offers[i].interest);
                 if(offers[i].lender != currentAccount.slice(currentAccount.lastIndexOf(".") + 1) && offers[i].amount >= 2000 && type == "borrower-main" && now < offers[i].last) {
                     $("#borrower-offers-table-body").append("<tr class=offers-row id=o" + i + "><td>" + offers[i].amount + "</td><td>" + offers[i].interest / 10 + "% (" + annualRate.toFixed(2) + "%)</td><td>" + 
-                        offersLength.remainDay + " day(s) " + offersLength.remainHour + " hour(s) " + offersLength.remainMin + " minute(s)</td><td>" + offers[i].periods + "</td><td>" + 
-                        currentOffer.remainDay + " day(s) " + currentOffer.remainHour + " hour(s) " + currentOffer.remainMin + " minute(s)</td><td>" + offers[i].score + "</td></tr>");
+                        offersLength.remainDay + " nap </td><td>" + offers[i].periods + "</td><td>" + 
+                        currentOffer.remainDay + " nap " + currentOffer.remainHour + " óra " + currentOffer.remainMin + " perc</td><td>" + offers[i].score + "</td></tr>");
                     $("#o" + i).val(i);
                 }
 
                 if(offers[i].lender == currentAccount.slice(currentAccount.lastIndexOf(".") + 1) && offers[i].amount > 0 && type == "lender-my-offers" && now < offers[i].last) {
                     $("#lender-my-offers-table-body").append("<tr class=my-offers-row id=ct" + i + "><td>" + offers[i].amount + "</td><td>" + offers[i].interest / 10 + "% (" + annualRate.toFixed(2) + "%)</td><td>" + 
-                        offersLength.remainDay + " day(s) " + offersLength.remainHour + " hour(s) " + offersLength.remainMin + " minute(s)</td><td>" + offers[i].periods + "</td><td>" + 
-                        currentOffer.remainDay + " day(s) " + currentOffer.remainHour + " hour(s) " + currentOffer.remainMin + " minute(s)</td><td>" + offers[i].score + "</td></tr>");
+                        offersLength.remainDay + " nap</td><td>" + offers[i].periods + "</td><td>" + 
+                        currentOffer.remainDay + " nap " + currentOffer.remainHour + " óra " + currentOffer.remainMin + " perc</td><td>" + offers[i].score + "</td></tr>");
                     $("#ct" + i).val("offer" + i);
                 }
             }
@@ -1304,15 +1029,15 @@ listClaims = (type) => {
                 //&& now < claims[i].last
                 if(claims[i].borrower != currentAccount.slice(currentAccount.lastIndexOf(".") + 1) && claims[i].amount >= 2000 && type == "lender-main" && now < claims[i].last) {
                     $("#lender-claims-table-body").append("<tr class=claims-row id=c" + i + "><td>" + claims[i].amount + "</td><td>" + claims[i].interest / 10 + "% (" + annualRate.toFixed(2) + "%)</td><td>" + 
-                        claimLength.remainDay + " nap " + claimLength.remainHour + " óra " + claimLength.remainMin + " perc </td><td>" + claims[i].periods + "</td><td>" + 
+                        claimLength.remainDay + " nap</td><td>" + claims[i].periods + "</td><td>" + 
                         currentClaim.remainDay + " nap " + currentClaim.remainHour + " óra " + currentClaim.remainMin + " perc</td><td>" + claims[i].score + "</td></tr>");
                     $("#c" + i).val(i);
                 }
                 //
                 if(claims[i].borrower == currentAccount.slice(currentAccount.lastIndexOf(".") + 1) && claims[i].amount > 0 && type == "borrower-my-claims" && now < claims[i].last) {
                     $("#borrower-my-claims-table-body").append("<tr class=my-offers-row id=ct" + i + "><td>" + claims[i].amount + "</td><td>" + claims[i].interest / 10 + "% (" + annualRate.toFixed(2) + "%)</td><td>" + 
-                        claimLength.remainDay + " day(s) " + claimLength.remainHour + " hour(s) " + claimLength.remainMin + " minute(s)</td><td>" + claims[i].periods + "</td><td>" + 
-                        currentClaim.remainDay + " day(s) " + currentClaim.remainHour + " hour(s) " + currentClaim.remainMin + " minute(s)</td></tr>");
+                        claimLength.remainDay + " nap</td><td>" + claims[i].periods + "</td><td>" + 
+                        currentClaim.remainDay + " nap " + currentClaim.remainHour + " óra " + currentClaim.remainMin + " perc</td></tr>");
                     $("#ct" + i).val("claim" + i);
                 }
             }
@@ -1529,20 +1254,3 @@ calculateRemaining = (resultTime, currentTime, currentOffer) => {
     let claimRemains = resultTime - currentTime;
     calcDate(claimRemains, currentOffer);
 } 
-
-solidityAddress = (address) => {
-    let len = address.toString(16).length;
-    let zeroCount = 40 - len;
-    let zeros = "0x";
-    for(let i = 0; i < zeroCount; i++) {
-        zeros += "0";
-    }
-    let hexAddress = zeros + address.toString(16);
-    //console.log("HEXADDRESS: " + hexAddress);
-    return(hexAddress);
-}
-
-accountNumber = (accountID) => {
-    const account = accountID.slice(accountID.lastIndexOf(".") + 1);
-    return account;
-}
