@@ -15,8 +15,8 @@ const ethTX = require('./set-eth-tx');
 require("dotenv").config();
 const paypal = require('@paypal/checkout-server-sdk');
 //console.log(paypal);
-let clientId = "AVt5Iuf9ZjOPigO_sGzNs0y7pqvYlLVP03rp-Wa7zKdEsXyCjndUFj9Xn-kP1sTxP1hUN9lQDAWmJYo5"; //"AQdyzp2vyeL2B4sx9K0hz2zjhDkXjeLaR1tBCaMH7jF719RB25MtlFb_YxwsT34CIHwc4csoAxxETspu";
-let clientSecret = "EHpwvH3AIGct-fBkj1JzqicaTjezBiPsMXkB5DY-gvsLdgzuTvn9MDFrpd1AnKx2i9oUs61o88P-iSk-"; //"EFF7BZzv4FXJEc13qSNbblguWL8VRFqnLeZZh23oojQ-qaCFYa6aslY0hvGhJR-4uBjWVLL1AxTtoKBK"; //
+let clientId = "AVt5Iuf9ZjOPigO_sGzNs0y7pqvYlLVP03rp-Wa7zKdEsXyCjndUFj9Xn-kP1sTxP1hUN9lQDAWmJYo5"; 
+let clientSecret = "EHpwvH3AIGct-fBkj1JzqicaTjezBiPsMXkB5DY-gvsLdgzuTvn9MDFrpd1AnKx2i9oUs61o88P-iSk-"; 
 // This sample uses SandboxEnvironment. In production, use LiveEnvironment
 let environment = new paypal.core.SandboxEnvironment(clientId, clientSecret); // LiveEnvironment(clientId, clientSecret)
 let paypalClient = new paypal.core.PayPalHttpClient(environment);
@@ -37,10 +37,10 @@ const dragonglassRequestEvents = {
 const dexAbiJson = fs.readFileSync("mxx_eth.abi");
 const dexAbi = JSON.parse(dexAbiJson);
 const Web3 = require("web3");
-const web3 = new Web3(new Web3.providers.WebsocketProvider("wss://ropsten.infura.io/ws/v3/1b90c946c0ee4c7ca5143c9f196d837e"));
+const web3 = new Web3(new Web3.providers.WebsocketProvider("wss://ropsten.infura.io/ws/v3/..."));
 const changeFromETH = new web3.eth.Contract(dexAbi, '0x17070EdD831C8BE6CC6f49A429d37134D7Dfb745');
 const ethAddr = "0xbA85271E915c385fe37bEDeC7Be046259885801b";
-const ethPrKey = Buffer.from("FD2C599C8F4FC954E3DEA60614229C29AA6AD5EA48298D11373C234C12B59F2D", "hex");
+const ethPrKey = Buffer.from("...", "hex");
 
 
 var express = require('express');
