@@ -1,0 +1,572 @@
+doctype html
+html
+	head
+		title MaxiCredit
+		link(rel="stylesheet", href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css")
+		link(rel='stylesheet' type='text/css' href='/mc.css')
+		link(rel="shortcut icon" type="image/png" href="/favicon.png")
+		script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js")
+	body
+		.cointainer(ng-app="mcApp" ng-controller="mcCtrl")
+			.header.p-3
+				.row
+					.col-lg-6#main-tab 
+						//img(src="mx4_m.png", alt="Maxit")
+						p Főoldal
+					.col-lg-6
+						.btn-group.btn-group-toggle.float-right(data-toggle="buttons")
+							label.btn.mc-bg-blue
+								input.wallet-tab(type="radio" name="" value="")
+								p.m-0 Tárca
+							label.btn.mc-bg-blue
+								input.lender-tab(type="radio" name="" value="")
+								p.m-0 Kölcsönadó
+							label.btn.mc-bg-blue
+								input.borrower-tab(type="radio" name="" value="")
+								p.m-0 Hitelfelvevő
+							label.btn.mc-bg-blue
+								input#refresh(type="radio" name="" value="")
+								p#login-tab-text.m-0 Frissítés
+							label.btn.mc-bg-blue
+								input#logout(type="radio" name="" value="")
+								p#login-tab-text.m-0 Kilépés
+			#account.bg-light.mx-3.p-3.maxit-account-box.mc-border-blue.rounded
+				.row
+					.col-lg-3.text-center#address
+					.col-lg-3.text-center#hbar-balance
+					.col-lg-3.text-center#mx-balance
+					.col-lg-3.text-center#score
+			#main.section.type-4.p-3
+				.row
+					.col-lg-4.px-3.mb-3
+						.mc-bg-blue.p-3.rounded-top.font-weight-bold Tárca
+						.mc-border-blue.p-3.rounded-bottom.maxit-main-box
+							p.send-receive-btn Pénz küldés/fogadás
+							p.change-btn Maxit váltó
+							p.account-info-btn Számla információ
+							p.personal-btn Regisztráció, adatmódosítás
+					.col-lg-4.px-3.mb-3
+						.mc-bg-blue.p-3.rounded-top.font-weight-bold Kölcsönadó
+						.mc-border-blue.bg-light.rounded-bottom.p-3.maxit-main-box 
+							p.loan-claims-btn Kölcsön kérelmek
+							p.my-offers-btn Saját ajánlat
+							p.create-offer-btn Új ajánlat
+							p.my-lendings-btn Nyújtott hiteleim
+					.col-lg-4.px-3.mb-3
+						.mc-bg-blue.p-3.rounded-top.font-weight-bold Hitelfelvevő
+						.mc-border-blue.rounded-bottom.p-3.maxit-main-box
+							p.loan-offers-btn Kölcsön ajánlatok
+							p.my-claims-btn Saját kérelem
+							p.create-claim-btn Új kérelem
+							p.my-credits-btn Felvett hiteleim
+				.maxit-main-box.rounded.text-center.mc-border-blue
+					H3.font-weight-bold.m-3 A MaxiCredit Platform Beta-verziója!
+					p Mind a Hedera, mind az Ethereum blokkláncon csak testneten érdemes használni!
+					p Ajánlott böngészők: Chrome, Brave. Használd a 
+						a(href="https://chrome.google.com/webstore/detail/composer-for-hedera-hashg/hdjnnemgikeoehneddegfcmkljenlean?ref=producthunt" target="_blank") Hashing Systems Composert 
+						label Hedera tárcának és a
+						br
+						a(href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en" target="_blank") Metamaskot 
+						label mint Ethereum tárca					
+			#wallet.section.type-4.p-3.d-none
+				.row
+					.col-lg-2
+					.col-lg-8
+						.mc-bg-blue.p-3.rounded-top.font-weight-bold
+							p#wallet-title.m-0 Maxit/Hbar küldése, fogadása
+						.mc-border-blue
+							#tx.d-none
+								.row
+									.col-lg-6.row.p-3.justify-content-center.text-center
+										.w-50
+											h3.mb-3 Küldés
+											select.mb-3.custom-select#send-selector(name="token")
+												option(value="Hbar") Hbar
+												option(value="Maxit") Maxit
+											input.mb-3.form-control#send-address(type="text" placeholder="Fogadó fél, például: 0.0.1234")
+											input.mb-3.form-control#send-amount(type="text" placeholder="Összeg")
+											button#send-btn.btn.mc-bg-blue.w-100 Send
+									.col-lg-6.row.p-3.justify-content-center.text-center
+										.w-50
+											h3 Fogadás
+											p Hedera cím:
+											div#qrcode
+											p Olvasd be a QR kódot és megkapod a Hedera címed
+							#change.d-none
+								.row
+									.col-lg-6.p-3
+										#mx-change.p-3
+											p.font-weight-bold Maxit vásárlása, eladása kriptovalutákkal
+											.text-center.align-items-center
+												.btn-group.btn-group-toggle.mb-3.w-100(data-toggle="buttons")
+													label#credit-offer-btn.btn.btn-secondary.mxx-button.w-50
+														input(type="radio" name="offer-type" ng-model="changeType" value="buy")
+														p.m-0 Vétel
+													label#credit-claim-btn.btn.btn-secondary.mxx-button.w-50
+														input(type="radio" name="offer-type" ng-model="changeType" value="sell")
+														p.m-0 Eladás
+												p.mb-1.text-left Válassz kriptovalutát
+												select.custom-select.w-100.mb-3(name="mx-pairs" ng-model="selectCurrency")
+													option(value="Hbar") Hbar
+													option(value="Tether") MCTether (MCT tesztként)
+													option(value="USDC") USDC (Nem sokára)
+													option(value="VPS") VPS token (Nem sokára)
+												p.mb-1.text-left Mennyiség
+												input.mb-3.form-control.w-100#mxx-amount(type="text" ng-model="changeAmount" placeholder="MX ")
+												p.mb-1#change-details(ng-bind="changeDetails()")
+												button#mxx-btn.btn.mc-bg-blue.w-100 Elfogad
+									.col-lg-6.p-3
+										div.p-3
+											p.font-weight-bold Maxit vásárlása bankkártyával 
+											p.mb-1 Vásárlandó Maxit
+											input.form-control.mb-3.w-100#paypal-mx-amount(type="text")
+											div#paypal
+							#account-info.d-none
+								table.m-0.table.table-dark.table-hover
+									thead
+										td Tőke
+										td Törlesztő
+										td Kamat
+										td Részletek
+										td Tartam
+									tbody#history-table
+								button#list-my-old-lendings.btn.mc-bg-blue.m-2 Korábbi nyújtott kölcsöneim
+								button#list-old-credits.btn.mc-bg-blue.m-2 Korábbi felvett hiteleim
+							#personal.d-none
+								#reg-user.d-none
+									.row.p-3
+										.col-lg-6
+											input#reg-lastname.form-control(type="text" placeholder="Vezeték név")
+											br
+											input#reg-firstname.form-control(type="text" placeholder="Keresztnév")
+											br
+											.input-group
+												input#reg-birth-lastname.form-control(type="text" placeholder="Születési vezetéknév ")
+												.input-group-append.w-50
+													button#reg-birth-lastname-copy.btn.btn-info.w-100 Azonos a vezetéknévvel
+											br
+											.input-group
+												input#reg-birth-firstname.form-control(type="text" placeholder="Születési keresztnév")
+												.input-group-append.w-50
+													button#reg-birth-firstname-copy.btn.btn-info.w-100 Azonos a keresztnévvel
+											br
+											input#mothers-lastname.form-control(type="text" placeholder="Anyja vezetékneve")
+											br
+											input#mothers-firstname.form-control(type="text" placeholder="Anyja keresztneve")
+											br
+											input#reg-birth-date.form-control(type="date" placeholder="Születési dátum")
+											br
+										.col-lg-6
+											input#id-number.form-control(type="text" placeholder="Személyi igazolvány száma")
+											br
+											input#citizen.form-control(type="text" placeholder="Állampolgárság")
+											br
+											input#country.form-control(type="text" placeholder="Ország")
+											br
+											input#city.form-control(type="text" placeholder="Város")
+											br
+											input#residental-address.form-control(type="text" placeholder="Lakcím (irányítószám, utca, házszám...)")
+											br
+											input#email-address.form-control(type="text" placeholder="Email cím")
+											br
+											input#phone-number.form-control(type="text" placeholder="Telefonszám (pédául 0036 70 100 2000)")
+											br
+									button#reg-submit.btn.mc-bg-blue.m-3 Regisztráció
+									br
+								#mod-user.d-none
+									.row.p-3
+										.col-lg-6
+											input#mod-lastname.form-control(type="text" placeholder="Vezeték név")
+											br
+											input#mod-firstname.form-control(type="text" placeholder="Keresztnév")
+											br
+											input#mod-id-number.form-control(type="text" placeholder="Személyi igazolvány száma")
+											br
+											input#mod-citizenship.form-control(type="text" placeholder="Állampolgárság")
+											br
+											input#mod-country.form-control(type="date" placeholder="Ország")
+											br
+										.col-lg-6
+											input#mod-city.form-control(type="text" placeholder="Város")
+											br
+											input#mod-residental-address.form-control(type="text" placeholder="Lakcím (irányítószám, utca, házszám...)")
+											br
+											input#mod-email-address.form-control(type="text" placeholder="Email cím")
+											br
+											input#mod-phone-number.form-control(type="text" placeholder="Telefonszám (pédául 0036 70 100 2000)")
+											br
+											input#mod-hedera-address.form-control(type="text" placeholder="További Hedera számlaszám hozzáadása")
+											br
+									button#mod-submit.btn.mc-bg-blue.m-3 Módosítás
+									br
+									p.m-3 További Hedera számlaszám visszaigazolása
+									input.m-3#mod-hedera-address-old.form-control.w-50(type="text" placeholder="Első Hedera számlaszám")
+									button#confirm-new-address.btn.mc-bg-blue.m-3 Megerősítés
+									br
+						.mc-bg-blue.p-3.rounded-bottom
+							.btn-group.btn-group-toggle(data-toggle="buttons")
+								label.send-receive-btn.btn.btn-secondary.mx-button
+									input(type="radio" name="send-receive" value="send-receive")
+									p.mx-2.mb-0 Küldés/fogadás
+								label.change-btn.btn.btn-secondary.mx-button
+									input(type="radio" name="change" value="change")
+									p.mx-2.mb-0 Váltó
+								label.account-info-btn.btn.btn-secondary.mx-button
+									input(type="radio" name="account-info" value="account-info")
+									p.mx-2.mb-0 Info
+								label.personal-btn.btn.btn-secondary.mx-button
+									input(type="radio" name="account-info" value="account-info")
+									p.mx-2.mb-0#personal-info-text Regisztráció
+					.col-lg-2
+			#lender.section.type-4.p-3.d-none
+				.row
+					.col-lg-2
+					.col-lg-8
+						.mc-bg-blue.p-3.rounded-top.font-weight-bold
+							p#lending-title.m-0 Kölcsönadó - Hitel kérelmek
+						.mc-border-blue
+							#loan-claims
+								table.m-0.table.table-dark.table-hover
+									thead#lender-claims-table-head
+										td Összeg
+										td Kamat  (Éves kamat)
+										td Hitel hossza
+										td Periodusok száma
+										td Kérelem lejárata
+										td Kérelmező minősítése
+									tbody#lender-claims-table-body.claims
+							#my-loan-offers.d-none
+								table.m-0.table.table-dark.table-hover
+									thead#lender-my-offers-table-head
+										td Összeg
+										td Kamat (Éves kamat)
+										td Hitel hossza
+										td Periodusok száma
+										td Kérelem lejárata
+										td Elvárt minimum minősítés
+									tbody#lender-my-offers-table-body.offers.my-offers
+							#create-offer.d-none
+								.row.p-3
+									.col-lg-6.p-3
+										label 
+											span.font-weight-bold Összeg
+											span : Nyújtandó kölcsön összege Maxitban (1 Maxit = 3.1 Forint)
+										input.mb-3.form-control.loan-amount(type="text" ng-model="offerAmount" placeholder="minimum 2000 MX")
+										label
+											span.font-weight-bold Hossz
+											span : Mennyire idő adsz kölcsön (nap)
+										input.mb-3.form-control.loan-length(type="text" ng-model="offerLength" placeholder="minimum 1 nap")
+										label
+											span.font-weight-bold Részletek száma
+											span : Két törlesztő részlet között minimum egy napnak kell lenni
+										input.mb-3.form-control.loan-periods(type="text" ng-model="offerPeriods" placeholder="minimum 1")
+										label
+											span.font-weight-bold Kamat
+											span : Részletenkénti kamat (tized százalék pontosan adható meg)
+										input.mb-3.form-control.interest-rate(type="text" ng-model="offerRate" placeholder="például 1.1")
+										label
+											span.font-weight-bold Ajánlat hossza
+											span : Hány napig érvényes az ajánlat
+										input.mb-3.form-control.last-to(type="text" placeholder="minimum 1 nap")
+										label
+											span.font-weight-bold Hitelminősítés
+											span : 0 és 1000 pont közötti minősítés adható meg
+										input.mb-3.form-control#credit-score(type="text" placeholder="ajánlott 100 felett")
+									.col-lg-6.p-3
+										table.table.table-dark.table-hover
+											tr
+												td Éves Kamat
+												td.text-right(ng-bind="offerAnnumRate()")
+											tr
+												td Törlesztő részlet
+												td.text-right(ng-bind="offerRedeem()")
+											tr
+												td Teljes visszajáró összeg
+												td.text-right(ng-bind="offerTotalPayback()")
+											tr
+												td Nyereség
+												td.text-right(ng-bind="offerProfit()")
+										p#create-offer-current-action
+								button.m-3.btn.mc-bg-blue.new-offer(name="offer") Elfogad
+							#my-lendings.d-none
+								table.m-0.table.table-dark.table-hover
+									thead
+										tr
+											td Tőke
+											td Részlet
+											td Kamat
+											td Részletek száma
+											td Hossz
+									tbody#my-liabilities.overflow-auto
+						.mc-bg-blue.p-3.rounded-bottom
+							.btn-group.btn-group-toggle(data-toggle="buttons")
+								label.btn.btn-secondary.mx-button
+									input.loan-claims-btn(type="radio" name="send-receive" value="send-receive")
+									p.mx-2.mb-0 Kérelmek
+								label.btn.btn-secondary.mx-button
+									input.my-offers-btn(type="radio" name="change" value="change")
+									p.mx-2.mb-0 Saját ajánlat(ok)
+								label.btn.btn-secondary.mx-button
+									input.create-offer-btn(type="radio" name="change" value="change")
+									p.mx-2.mb-0 Új ajánlat
+								label.btn.btn-secondary.mx-button
+									input.my-lendings-btn(type="radio" name="account-info" value="account-info")
+									p.mx-2.mb-0 Hiteleim
+					.col-lg-2
+			#borrower.section.type-4.p-3.d-none
+				.row
+					.col-lg-2
+					.col-lg-8
+						.mc-bg-blue.p-3.rounded-top.font-weight-bold
+							p#borrower-title.m-0 Hitelfelvevő - Hitel ajánlatok
+						.mc-border-blue
+							#loan-offers.d-none
+								table.m-0.table.table-dark.table-hover
+									thead#borrower-offers-table-head
+										td Összeg
+										td Kamat (Éves kamat)
+										td Hitel hossza
+										td Periodusok száma
+										td Ajánlat lejárata
+										td Minimum minősítési szint
+									tbody#borrower-offers-table-body.offers
+							#my-loan-claims.d-none
+								table.m-0.table.table-dark.table-hover
+									thead#borrower-my-claims-table-head
+										td Összeg
+										td Kamat (Éves kamat)
+										td Hitel hossza
+										td Periodusok száma
+										td Ajánlat lejárata
+									tbody#borrower-my-claims-table-body.claims.my-offers
+							#create-claim.d-none
+								.row.p-3
+									.col-lg-6.p-3
+										label
+											span.font-weight-bold Összeg 
+											span : Kért kölcsön összege Maxitban (1 Maxit = 3.1 Forint)
+										input.mb-3.form-control.loan-amount(type="text" ng-model="claimAmount" placeholder="minimum 2000 MX")
+										label
+											span.font-weight-bold Hossz
+											span : Mennyire idő kérsz kölcsön (nap)
+										input.mb-3.form-control.loan-length(type="text" ng-model="claimLength" placeholder="minimum 1 nap")
+										label
+											span.font-weight-bold Részletek száma
+											span : Két törlesztő részlet között minimum egy napnak kell lenni
+										input.mb-3.form-control.loan-periods(type="text" ng-model="claimPeriods" placeholder="minimum 1")
+										label
+											span.font-weight-bold Kamat 
+											span : Periódusonként százalékban (tized százalék pontosan adható meg)
+										input.mb-3.form-control.interest-rate(type="text" ng-model="claimRate" placeholder="például 1.1")
+										label
+											span.font-weight-bold Kérelem hossza
+											span : Hány napig érvényes az hitel kérelem
+										input.mb-3.form-control.last-to(type="text" placeholder="minimum 1 nap")
+									.col-lg-6.p-3
+										table.table.table-dark.table-hover
+											tr
+												td Éves Kamat
+												td.text-right(ng-bind="claimAnnumRate()")
+											tr
+												td Kézhez kapható összeg 
+												td.text-right(ng-bind="claimAmountToBorrower()")
+											tr
+												td Törlesztő részlet
+												td.text-right(ng-bind="claimRedeem()")
+											tr
+												td Teljes visszafizetendő összeg
+												td.text-right(ng-bind="claimTotalPayback()")
+								button.m-3.btn.mc-bg-blue.new-offer(name="claim") Elfogad
+							#my-credits.d-none
+								table.m-0.table.table-dark.table-hover
+									thead
+										tr
+											td Tőke
+											td Részlet
+											td Kamat (Éves kamat)
+											td Részletek száma
+											td Hossz
+									tbody#my-loans.overflow-auto
+						.mc-bg-blue.p-3.rounded-bottom
+							.btn-group.btn-group-toggle(data-toggle="buttons")
+								label.btn.btn-secondary.mx-button
+									input.loan-offers-btn(type="radio" name="send-receive" value="send-receive")
+									p.mx-2.mb-0 Ajánlatok
+								label.btn.btn-secondary.mx-button
+									input.my-claims-btn(type="radio" name="change" value="change")
+									p.mx-2.mb-0 Saját kérelmek
+								label.btn.btn-secondary.mx-button
+									input.create-claim-btn(type="radio" name="change" value="change")
+									p.mx-2.mb-0 Új kérelem
+								label.btn.btn-secondary.mx-button
+									input.my-credits-btn(type="radio" name="account-info" value="account-info")
+									p.mx-2.mb-0 Hiteleim
+					.col-lg-2
+			.section.bg-secondary.p-3.mx-3.mb-3.maxit-account-box.mc-border-blue.rounded
+				.row
+					.col-lg-6
+						p email
+						p info@maxicreditcompany.com
+					.col-lg-6
+						.float-right
+							p facebook
+							p twitter		
+			.footer.p-3.bg-dark.mx-3.mb-3.maxit-account-box.mc-border-blue.rounded
+				p.text-info MaxiCredit 2019
+			.modal#login-modal
+				.modal-dialog
+					.modal-content
+						.modal-header.bg-light
+							h3.font-weight-bold.m-3 Belépés
+						.modal-body
+							.row
+								.col-lg-6
+									p.mb-1 Számlaszám
+									input.form-control.mb-3#login-acc(type="text" placeholder="0.0.12345")
+									p.mb-1 Privát kulcs
+									input.form-control.mb-3#login-prkey(type="password" placeholder="")
+								.col-lg-6
+									p.mb-1 Belépés key file révén
+									label.btn.mc-bg-blue
+										input#login-key.d-none(type="file") 
+										p.m-0 Tallózás
+									p#choosen-key
+							p#login-error
+						.modal-footer.bg-light
+							button#login-btn.btn.mc-bg-blue Belépés
+							button#new-account.btn.mc-bg-blue Új számla
+			.modal#change-my-lendings-modal
+				.modal-dialog
+					.modal-content 
+						.modal-header
+							h3.font-weight-bold.m-3 Nyújtott kölcsön módosítása
+						.modal-body
+							p#my-lendings-to-change-id
+							.input-group.mb-3
+								input#change-my-lendings-amount.form-control(type="text" placeholder="MX")
+								.input-group-append.w-50
+									button#change-my-lendings-capital-btn.btn.btn-primary.w-75 Tőke elengedése	
+							.input-group.mb-3
+								input#change-my-lendings-rate.form-control(type="text" placeholder="%")
+								.input-group-append.w-50
+									button#change-my-lendings-interest-btn.btn.btn-primary.w-75 Kamat csökkentése
+							.input-group.mb-3
+								input#change-my-lendings-periods.form-control(type="text" placeholder="Részletek száma")
+								.input-group-append.w-50
+									button#change-my-lendings-periods-btn.btn.btn-primary.w-75 Futamidő (részletek számának) növelése
+							.input-group.mb-3
+								input#change-my-lendings-sell.form-control(type="text" placeholder="Eladási ár")
+								.input-group-append.w-50
+									button#change-my-lendings-sell-btn.btn.btn-primary.w-75 Követelés eladása
+						.modal-footer
+							button.btn.btn-danger#close-change-my-lendings-modal(data-dismiss="modal") Bezárás
+			.modal#change-delete-offers-claims-modal
+				.modal-dialog
+					.modal-content
+						.modal-header
+							h3.font-weight-bold.m-3 Kérelem/ajánlat módosítása, törlése
+						.modal-body
+							p#offer-to-change-id
+							input.form-control#change-offers-claims-amount(type="text" placeholder="Ajánlat/kérelem csökkentésének összege")
+							button.btn.btn-info#change-offers-claims(data-dismiss="modal") Módosítás
+							button.btn.btn-danger#delete-offers-claims(data-dismiss="modal") Törlés
+						.modal-footer
+							button.btn.btn-danger#close-change-delete-offers-claims-modal(data-dismiss="modal") Mégse
+			.modal#claim-to-accept-modal
+				.modal-dialog
+					.modal-content
+						.modal-header
+							h3.font-weight-bold.m-3 Kérelem elfogadása
+						.modal-body
+							table
+								tbody
+									tr
+										td Kérelem azonosítója
+										td#claim-to-accept-id.float-right
+									tr
+										td Kölcsönvevő számlaszáma
+										td#claim-to-accept-address.float-right
+									tr
+										td Kölcsönvevő kora
+										td#claim-to-accept-age.float-right
+									tr
+										td Kölcsönvevő hitelminősítése a számlaforgalma alapján
+										td#claim-to-accept-volume-score.float-right
+									tr
+										td Ország
+										td#claim-to-accept-country.float-right
+									tr
+										td Város
+										td#claim-to-accept-city.float-right
+									tr
+										td Éves kamat
+										td#claim-to-accept-annum-rate.float-right
+									tr
+										td Minimum kölcsönadható összeg
+										td#claim-to-accept-min.float-right
+									tr
+										td Maximum kölcsönadható összeg
+										td#claim-to-accept-max.float-right
+							br
+							.input-group
+								input.form-control.w-75#accept-claim-amount(type="text", placeholder="Kölcsön összege")
+								.input-group-append.w-50
+									button.btn.btn-info#accept-claim-btn(data-dismiss="modal") Elfogadás	
+						.modal-footer
+							button.btn.btn-danger#close-claim-to-accept-modal(data-dismiss="modal") Mégse	
+			.modal#offer-to-accept-modal
+				.modal-dialog
+					.modal-content
+						.modal-header
+							h3.font-weight-bold.m-3 Hitel ajánlat elfogadása
+						.modal-body
+							table
+								tbody
+									tr
+										td Ajánlat azonosítója
+										td.float-right#offer-to-accept-id
+									tr
+										td Éves kamat (%)
+										td.float-right#offer-to-accept-annum-rate
+									tr
+										td Felvehető hitel minimum összege
+										td.float-right#offer-to-accept-min
+									tr
+										td Felvehető hitel maximum összege
+										td.float-right#offer-to-accept-max
+							.input-group
+								input.form-control.w-75#accept-offer-amount(type="text", placeholder="Felveendő hitel összege")
+								.input-group-append.w-50
+									button.btn.btn-info#accept-offer-btn(data-dismiss="modal") Elfogad
+						.modal-footer
+							button.btn.btn-danger#close-offer-to-accept-modal(data-dismiss="modal") Mégse
+			.modal#alert-modal
+				.modal-dialog
+					.modal-content
+						.modal-header
+							h3.font-weight-bold.m-3 FIGYELEM
+						.modal-body
+							p.mb-1#alert-text
+						.modal-footer
+							button.btn.btn-info#alert-close-btn OK
+			.modal#new-account-modal
+				.modal-dialog.modal-dialog-centered.modal-dialog-scrollable.w-75
+					.modal-content
+						.modal-header
+							h3.font-weight-bold.m-3 Az új számlád adatai
+						.modal-body
+							p Mentsd el a számla adataidat egy biztonságos helyre!!!
+							p#new-account-number
+							p#new-account-prkey
+							button.btn.btn-primary#save-new-account Mentés fileként
+						.modal-footer 
+							button.btn.btn-danger#close-new-account-modal(data-dismiss="modal") Bezár
+		script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js")
+		script(src="https://www.paypal.com/sdk/js?client-id=AVt5Iuf9ZjOPigO_sGzNs0y7pqvYlLVP03rp-Wa7zKdEsXyCjndUFj9Xn-kP1sTxP1hUN9lQDAWmJYo5&currency=HUF" data-namespace="paypal_sdk")
+		script
+			include ../web3.min.js
+			include ../erc20.js
+			include ../change_eth_abi.js
+			include ../node_modules/bignumber.js/bignumber.js
+			include ../test.js
+			include ../qr/jquery-qrcode-1.0/jquery.qrcode.min.js
