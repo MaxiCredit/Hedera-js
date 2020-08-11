@@ -229,7 +229,7 @@ html
 								table.m-0.table.table-dark.table-hover
 									thead#lender-claims-table-head
 										td Összeg
-										td Kamat  (Éves kamat)
+										td Éves kamat
 										td Hitel hossza
 										td Periodusok száma
 										td Kérelem lejárata
@@ -239,7 +239,7 @@ html
 								table.m-0.table.table-dark.table-hover
 									thead#lender-my-offers-table-head
 										td Összeg
-										td Kamat (Éves kamat)
+										td Éves kamat
 										td Hitel hossza
 										td Periodusok száma
 										td Kérelem lejárata
@@ -324,7 +324,7 @@ html
 								table.m-0.table.table-dark.table-hover
 									thead#borrower-offers-table-head
 										td Összeg
-										td Kamat (Éves kamat)
+										td Éves kamat
 										td Hitel hossza
 										td Periodusok száma
 										td Ajánlat lejárata
@@ -334,10 +334,10 @@ html
 								table.m-0.table.table-dark.table-hover
 									thead#borrower-my-claims-table-head
 										td Összeg
-										td Kamat (Éves kamat)
+										td Éves kamat
 										td Hitel hossza
 										td Periodusok száma
-										td Ajánlat lejárata
+										td Kérelem lejárata
 									tbody#borrower-my-claims-table-body.claims.my-offers
 							#create-claim.d-none
 								.row.p-3
@@ -383,7 +383,7 @@ html
 										tr
 											td Tőke
 											td Részlet
-											td Kamat (Éves kamat)
+											td Éves kamat
 											td Részletek száma
 											td Hossz
 									tbody#my-loans.overflow-auto
@@ -519,27 +519,61 @@ html
 					.modal-content
 						.modal-header
 							h3.font-weight-bold.m-3 Hitel ajánlat elfogadása
-						.modal-body
-							table
+						.modal-body.p-0
+							table.m-0.table.table-dark.table-hover
 								tbody
 									tr
 										td Ajánlat azonosítója
-										td.float-right#offer-to-accept-id
+										td.text-right#offer-to-accept-id(ng-model="offerAcceptId")
 									tr
 										td Éves kamat (%)
-										td.float-right#offer-to-accept-annum-rate
+										td.text-right#offer-to-accept-annum-rate
 									tr
 										td Felvehető hitel minimum összege
-										td.float-right#offer-to-accept-min
+										td.text-right#offer-to-accept-min
 									tr
 										td Felvehető hitel maximum összege
-										td.float-right#offer-to-accept-max
-							.input-group
-								input.form-control.w-75#accept-offer-amount(type="text", placeholder="Felveendő hitel összege")
+										td.text-right#offer-to-accept-max
+									tr
+										td Kézhez kapott összeg
+										td.text-right#offer-to-accept-cash(ng-bind="offerAcceptCash()")
+									tr
+										td Törlesztő
+										td.text-right#offer-to-accept-redeem(ng-bind="offerAcceptRedeem()")
+									tr
+										td Összesen visszafizetendő
+										td.text-right#offer-to-accept-total(ng-bind="offerAcceptTotal()")
+							.input-group.m-3
+								input.form-control.w-75#accept-offer-amount(type="text", placeholder="Felveendő hitel összege", ng-model="offerAcceptAmount")
 								.input-group-append.w-50
 									button.btn.btn-info#accept-offer-btn(data-dismiss="modal") Elfogad
 						.modal-footer
 							button.btn.btn-danger#close-offer-to-accept-modal(data-dismiss="modal") Mégse
+			.modal#my-credits-details
+				.modal-dialog
+					.modal-content
+						.modal-header
+							h3.font-weight-bold.m-3 Hitel adatai
+						.modal-body.p-0
+							table.m-0.table.table-dark.table-hover
+								tbody
+									tr 
+										td Szerződés szám
+										td.text-right#my-credits-details-id
+									tr
+										td Kezdet
+										td.text-right#my-credits-details-start
+									tr
+										td Következő törlesztő
+										td.text-right#my-credits-details-exp
+									tr 
+										td Törlesztő összege
+										td.text-right#my-credits-details-redeem
+									tr 
+										td Periódikus kamat
+										td.text-right#my-credits-details-rate
+						.modal-footer
+							button.btn.mc-bg-blue#my-credits-details-close-btn Bezár	
 			.modal#alert-modal
 				.modal-dialog
 					.modal-content
@@ -548,7 +582,7 @@ html
 						.modal-body
 							p.mb-1#alert-text
 						.modal-footer
-							button.btn.btn-info#alert-close-btn OK
+							button.btn.mc-bg-blue#alert-close-btn OK
 			.modal#new-account-modal
 				.modal-dialog.modal-dialog-centered.modal-dialog-scrollable.w-75
 					.modal-content
