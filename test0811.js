@@ -11,6 +11,7 @@ let currentTab = $("#main");
 let lastTab = $("#loan-claims");
 let prevMxx = $("#credit-offer-btn");
 let prevMX = $("#send-receive-btn");
+let creditOffers = [];
 
 window.onbeforeunload = function () {
     if(logged == 1) {
@@ -38,7 +39,7 @@ let setSize = () => {
 
 $(window).on("load", () => {
     $("#login-modal").show();
-	setSize();
+    setSize();
 });
 
 if (typeof window.ethereum !== 'undefined') {
@@ -62,8 +63,8 @@ if(typeof web3 !== 'undefined') {
     //console.log(web3.currentProvider);
     //console.log(web3.version);
 } else {
-    //console.error('web3 was undefined');
-	web3 = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/v3/1b90c946c0ee4c7ca5143c9f196d837e"));
+    console.error('web3 was undefined');
+		web3 = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/v3/1b90c946c0ee4c7ca5143c9f196d837e"));
 }
 
 const ST6Address = '0x646c49b692cea87aa4dbb13f34346fa781067f21';
@@ -430,6 +431,7 @@ offerNgApp.controller("mcCtrl", function($scope) {
     var redeem;
     var totalPayback;
     var profit; 
+    var offerToAcceptId;
     $scope.offerAnnumRate = function() {
         if($scope.offerRate) {
             return((annumInterest($scope.offerLength * 86400, $scope.offerPeriods, parseInt($scope.offerRate * 10))).toFixed(2) + "%");
@@ -466,7 +468,6 @@ offerNgApp.controller("mcCtrl", function($scope) {
     }
     $scope.claimRedeem = function() {
         redeem = parseInt($scope.claimAmount) * (parseInt($scope.claimRate * 10)) / 1000 / (1 - (1 / (Math.pow(1 + ((parseInt($scope.claimRate * 10)) / 1000), parseInt($scope.claimPeriods)))));
-        //redeem = parseInt($scope.offerAmount) * (parseInt($scope.offerRate) * 10) / 1000 / (1 - (1 / (Math.pow(1 + (parseInt($scope.offerRate) * 10) / 1000), parseInt($scope.offerPeriods))));
         if($scope.claimRate) return(parseInt(redeem) + "MX");
         else return "";
     };
@@ -507,6 +508,32 @@ offerNgApp.controller("mcCtrl", function($scope) {
             }
             return changeDetailsResponse;
         } else return "";
+    }
+
+    $scope.offerAcceptCash = function() {
+        let amountToReceive = parseInt(parseInt($scope.offerAcceptAmount) * 995 / 1000);
+        if($scope.offerAcceptAmount) return(amountToReceive +  " MX");
+        else return "";
+    }
+
+    $scope.offerAcceptRedeem = function() {
+        offerToAcceptId = $("#offer-to-accept-id").val();
+        if(creditOffers[offerToAcceptId]) {
+            console.log(creditOffers[offerToAcceptId].interest);
+            redeem = parseInt($scope.offerAcceptAmount) * (parseInt(creditOffers[offerToAcceptId].interest)) / 1000 / (1 - (1 / (Math.pow(1 + ((parseInt(creditOffers[offerToAcceptId].interest)) / 1000), parseInt(creditOffers[offerToAcceptId].periods)))));
+            if($scope.offerAcceptAmount) return(parseInt(redeem)  +  " MX");
+        } else {
+            return "";
+        }
+    }
+
+    $scope.offerAcceptTotal = function() {
+        if(creditOffers[offerToAcceptId]) {
+            totalPayback = redeem * parseInt(creditOffers[offerToAcceptId].periods);
+            if($scope.offerAcceptAmount) return(parseInt(totalPayback) + " MX");
+        } else {
+            return "";
+        }
     }
 });
 
@@ -837,6 +864,33 @@ $(".my-credits-btn").click(() => {
     listCredits();
 });
 
+let myCredits = [];
+listCredits = () => {
+    $.post('listCredits', {'pr' : privateKey, 'acc' : currentAccount}, function(data, status) {
+        //console.log(status);
+        //console.log(data);
+        if(status = "SUCCESS" && data != "No credits") {
+            myCredits = JSON.parse(data);
+            let lengthDHM = {};
+
+            $("#my-loans").empty();
+            for(let i in myCredits) {
+                //console.log(claims[i].borrower + " " + account.slice(account.lastIndexOf(".") + 1));
+                let loanLength = parseInt(myCredits[i].length);
+                let periods = parseInt(myCredits[i].periods);
+                let interestRate = parseInt(myCredits[i].interestRate);
+                let yearlyRate = annumInterest(loanLength, periods, interestRate);
+                if(myCredits[i].capital > 0) {
+                    calcDate(myCredits[i].length, lengthDHM);
+                    $("#my-loans").append("<tr class=my-credits-row id=mcr" + i + "><td>" + myCredits[i].capital + " / " + myCredits[i].initialCapital + "</td><td>" + 
+                        myCredits[i].toPayBack + "</td><td>" + yearlyRate.toFixed(2) + "%</td><td>" + myCredits[i].lastReedem + " / " + 
+                        myCredits[i].periods + "</td><td>" + lengthDHM.remainDay + " nap</td></tr>");
+                    $("#mcr" + i).val(i);
+                }		
+            }
+        }
+    });
+}
 
 $("#list-old-credits").click(() => {
     $.post('listCredits', {'pr' : privateKey, 'acc' : currentAccount}, function(data, status) {
@@ -864,32 +918,26 @@ $("#list-old-credits").click(() => {
     });
 });
 
-listCredits = () => {
-    $.post('listCredits', {'pr' : privateKey, 'acc' : currentAccount}, function(data, status) {
-        //console.log(status);
-        //console.log(data);
-        if(status = "SUCCESS" && data != "No credits") {
-            let myCredits = JSON.parse(data);
-            let lengthDHM = {};
+$("#my-loans").on("click", ".my-credits-row", function() {
+    console.log("My credit id: " + $(this).val());
+    let myCurrentCredit = myCredits[$(this).val()];
+    $("#my-credits-details-id").html(myCurrentCredit.loanId);
+    let start = new Date(myCurrentCredit.start * 1000);
+    //let exp = new Date((myCurrentCredit.start + (myCurrentCredit.length / myCurrentCredit.periods) * myCurrentCredit.lastReedem) * 1000);
+    let exp = new Date((parseInt(myCurrentCredit.start) + (parseInt(myCurrentCredit.length) / parseInt(myCurrentCredit.periods)) * (parseInt(myCurrentCredit.lastReedem) + 1)) * 1000);
+    console.log(parseInt(myCurrentCredit.start) + (parseInt(myCurrentCredit.length) / parseInt(myCurrentCredit.periods)) * parseInt(myCurrentCredit.lastReedem));
+    $("#my-credits-details-start").html(start.toLocaleDateString() + " " + start.toLocaleTimeString());
+    $("#my-credits-details-exp").html(exp.toLocaleDateString() + " " + exp.toLocaleTimeString());
+    $("#my-credits-details-redeem").html(myCurrentCredit.toPayBack + "MX");
+    $("#my-credits-details-rate").html(myCurrentCredit.interestRate / 10 + "%");
+    $("#my-credits-details").show();
+});
 
-            $("#my-loans").empty();
-            for(let i in myCredits) {
-                //console.log(claims[i].borrower + " " + account.slice(account.lastIndexOf(".") + 1));
-                let loanLength = parseInt(myCredits[i].length);
-                let periods = parseInt(myCredits[i].periods);
-                let interestRate = parseInt(myCredits[i].interestRate);
-                let yearlyRate = annumInterest(loanLength, periods, interestRate);
-                if(myCredits[i].capital > 0) {
-                    calcDate(myCredits[i].length, lengthDHM);
-                    $("#my-loans").append("<tr><td>" + myCredits[i].capital + " / " + myCredits[i].initialCapital + "</td><td>" + 
-                        myCredits[i].toPayBack + "</td><td>" + myCredits[i].interestRate / 10 + " (" + yearlyRate.toFixed(2) + "%)</td><td>" + myCredits[i].lastReedem + " / " + 
-                        myCredits[i].periods + "</td><td>" + lengthDHM.remainDay + " nap</td></tr>");
-                }		
-            }
-        }
-    });
-}
-
+$("#my-credits-details-close-btn").click(() => {
+    $("#my-credits-details").hide();
+    $("#my-credits-details-id").html("");
+    $("#my-credits-details-start").html("");
+});
 
 let myLendings = [];
 listLendings = () => {
@@ -1116,7 +1164,6 @@ $(".new-offer").click(function() {
     }
 });
 
-let creditOffers = [];
 listOffers = (type) => {
     $.post('offers', {'acc': currentAccount}, (data, status) => {
         //console.log(status);
@@ -1136,14 +1183,14 @@ listOffers = (type) => {
                 calcDate(offers[i].length, offersLength);
                 let annualRate = annumInterest(offers[i].length, offers[i].periods, offers[i].interest);
                 if(offers[i].lender != currentAccount.slice(currentAccount.lastIndexOf(".") + 1) && offers[i].amount >= 2000 && type == "borrower-main" && now < offers[i].last) {
-                    $("#borrower-offers-table-body").append("<tr class=offers-row id=o" + i + "><td>" + offers[i].amount + "</td><td>" + offers[i].interest / 10 + "% (" + annualRate.toFixed(2) + "%)</td><td>" + 
+                    $("#borrower-offers-table-body").append("<tr class=offers-row id=o" + i + "><td>" + offers[i].amount + " MX</td><td>" + annualRate.toFixed(2) + "%</td><td>" + 
                         offersLength.remainDay + " nap </td><td>" + offers[i].periods + "</td><td>" + 
                         currentOffer.remainDay + " nap " + currentOffer.remainHour + " óra " + currentOffer.remainMin + " perc</td><td>" + offers[i].score + "</td></tr>");
                     $("#o" + i).val(i);
                 }
 
                 if(offers[i].lender == currentAccount.slice(currentAccount.lastIndexOf(".") + 1) && offers[i].amount > 0 && type == "lender-my-offers" && now < offers[i].last) {
-                    $("#lender-my-offers-table-body").append("<tr class=my-offers-row id=ct" + i + "><td>" + offers[i].amount + "</td><td>" + offers[i].interest / 10 + "% (" + annualRate.toFixed(2) + "%)</td><td>" + 
+                    $("#lender-my-offers-table-body").append("<tr class=my-offers-row id=ct" + i + "><td>" + offers[i].amount + " MX</td><td>" + annualRate.toFixed(2) + "%</td><td>" + 
                         offersLength.remainDay + " nap</td><td>" + offers[i].periods + "</td><td>" + 
                         currentOffer.remainDay + " nap " + currentOffer.remainHour + " óra " + currentOffer.remainMin + " perc</td><td>" + offers[i].score + "</td></tr>");
                     $("#ct" + i).val("offer" + i);
@@ -1156,6 +1203,7 @@ listOffers = (type) => {
 $(".offers").on("click", ".offers-row", function() {
     let number = $(this).val();
     $("#offer-to-accept-id").html(number);
+    $("#offer-to-accept-id").val(number);
     var loanLength = parseInt(creditOffers[number].length);
     var periods = parseInt(creditOffers[number].periods);
     var interestRate = parseInt(creditOffers[number].interest);
@@ -1230,14 +1278,14 @@ listClaims = (type) => {
                 //console.log(currentClaim.remainDay + " " + currentClaim.remainHour + " " + currentClaim.remainMin);
                 //&& now < claims[i].last
                 if(claims[i].borrower != currentAccount.slice(currentAccount.lastIndexOf(".") + 1) && claims[i].amount >= 2000 && type == "lender-main" && now < claims[i].last) {
-                    $("#lender-claims-table-body").append("<tr class=claims-row id=c" + i + "><td>" + claims[i].amount + "</td><td>" + claims[i].interest / 10 + "% (" + annualRate.toFixed(2) + "%)</td><td>" + 
+                    $("#lender-claims-table-body").append("<tr class=claims-row id=c" + i + "><td>" + claims[i].amount + " MX</td><td>" + annualRate.toFixed(2) + "%</td><td>" + 
                         claimLength.remainDay + " nap</td><td>" + claims[i].periods + "</td><td>" + 
                         currentClaim.remainDay + " nap " + currentClaim.remainHour + " óra " + currentClaim.remainMin + " perc</td><td>" + claims[i].score + "</td></tr>");
                     $("#c" + i).val(i);
                 }
                 //
                 if(claims[i].borrower == currentAccount.slice(currentAccount.lastIndexOf(".") + 1) && claims[i].amount > 0 && type == "borrower-my-claims" && now < claims[i].last) {
-                    $("#borrower-my-claims-table-body").append("<tr class=my-offers-row id=ct" + i + "><td>" + claims[i].amount + "</td><td>" + claims[i].interest / 10 + "% (" + annualRate.toFixed(2) + "%)</td><td>" + 
+                    $("#borrower-my-claims-table-body").append("<tr class=my-offers-row id=ct" + i + "><td>" + claims[i].amount + " MX</td><td>" + annualRate.toFixed(2) + "%</td><td>" + 
                         claimLength.remainDay + " nap</td><td>" + claims[i].periods + "</td><td>" + 
                         currentClaim.remainDay + " nap " + currentClaim.remainHour + " óra " + currentClaim.remainMin + " perc</td></tr>");
                     $("#ct" + i).val("claim" + i);
@@ -1478,3 +1526,5 @@ accountNumber = (accountID) => {
     const account = accountID.slice(accountID.lastIndexOf(".") + 1);
     return account;
 }
+
+
