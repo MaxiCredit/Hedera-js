@@ -64,7 +64,7 @@ if(typeof web3 !== 'undefined') {
     //console.log(web3.version);
 } else {
     console.error('web3 was undefined');
-		web3 = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/v3/1b90c946c0ee4c7ca5143c9f196d837e"));
+		web3 = new Web3(new Web3.providers.HttpProvider("https://ropsten.infura.io/v3/..."));
 }
 
 const ST6Address = '0x646c49b692cea87aa4dbb13f34346fa781067f21';
